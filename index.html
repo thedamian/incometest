@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Income Percentile Calculator</title>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+  <div class="bg-white shadow-lg rounded-2xl p-8 max-w-xl w-full">
+    <h1 class="text-3xl font-bold mb-4 text-center">Income Percentile Calculator</h1>
+    <p class="text-gray-600 mb-6 text-center">Enter your annual income to see where you stand among U.S. taxpayers.</p>
+
+    <input id="incomeInput" type="text" placeholder="Enter your income..." class="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+    <button onclick="calculate()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl">Calculate</button>
+
+    <div id="results" class="mt-6 hidden bg-gray-50 p-4 rounded-xl border">
+      <p id="sameIncome" class="text-lg font-medium"></p>
+      <p id="lessIncome" class="text-lg font-medium mt-2"></p>
+      <p id="percentile" class="text-lg font-bold text-blue-700 mt-4"></p>
+      <p id="references" class="text-sm text-gray-500 mt-4">Data Source: <a href="https://www.irs.gov/statistics/soi-tax-stats-individual-statistical-tables-by-size-of-adjusted-gross-income"><u>IRS Tax Statistics from 2022</u></a></p>
+    </div>
+  </div>
+
+  <script>
+    // Format input with commas
+    const incomeInput = document.getElementById("incomeInput");
+    
+    incomeInput.addEventListener("input", function(e) {
+      let value = e.target.value.replace(/,/g, ''); // Remove existing commas
+      
+      // Only allow numbers
+      if (!/^\d*$/.test(value)) {
+        value = value.replace(/\D/g, '');
+      }
+      
+      // Format with commas
+      if (value) {
+        e.target.value = "$" + Number(value).toLocaleString('en-US');
+      } else {
+        e.target.value = '';
+      }
+    });
+
+    // PLACEHOLDER: Replace with your real JSON data
+    const incomeData = [
+  {
+    "Min":0,
+    "Max":"1",
+    "Returns":3254225,
+    "totals":3254225
+  },
+  {
+    "Min":1,
+    "Max":"5000",
+    "Returns":8195783,
+    "totals":11450008
+  },
+  {
+    "Min":5000,
+    "Max":"10000",
+    "Returns":8747727,
+    "totals":20197735
+  },
+  {
+    "Min":10000,
+    "Max":"15000",
+    "Returns":9642322,
+    "totals":29840057
+  },
+  {
+    "Min":15000,
+    "Max":"20000",
+    "Returns":9058382,
+    "totals":38898439
+  },
+  {
+    "Min":20000,
+    "Max":"25000",
+    "Returns":8035277,
+    "totals":46933716
+  },
+  {
+    "Min":25000,
+    "Max":"30000",
+    "Returns":8005289,
+    "totals":54939005
+  },
+  {
+    "Min":30000,
+    "Max":"40000",
+    "Returns":15771561,
+    "totals":70710566
+  },
+  {
+    "Min":40000,
+    "Max":"50000",
+    "Returns":13255063,
+    "totals":83965629
+  },
+  {
+    "Min":50000,
+    "Max":"75000",
+    "Returns":23805797,
+    "totals":107771426
+  },
+  {
+    "Min":75000,
+    "Max":"100000",
+    "Returns":15181035,
+    "totals":122952461
+  },
+  {
+    "Min":100000,
+    "Max":"200000",
+    "Returns":25887136,
+    "totals":148839597
+  },
+  {
+    "Min":200000,
+    "Max":"500000",
+    "Returns":10017626,
+    "totals":158857223
+  },
+  {
+    "Min":500000,
+    "Max":"1000000",
+    "Returns":1674608,
+    "totals":160531831
+  },
+  {
+    "Min":1000000,
+    "Max":"1500000",
+    "Returns":360882,
+    "totals":160892713
+  },
+  {
+    "Min":1500000,
+    "Max":"2000000",
+    "Returns":148222,
+    "totals":161040935
+  },
+  {
+    "Min":2000000,
+    "Max":"5000000",
+    "Returns":208129,
+    "totals":161249064
+  },
+  {
+    "Min":5000000,
+    "Max":"10000000",
+    "Returns":52968,
+    "totals":161302032
+  },
+  {
+    "Min":10000000,
+    "Max":"1000000000000000000000",
+    "Returns":34630,
+    "totals":161336662
+  }
+]
+
+    function calculate() {
+      const inputValue = document.getElementById("incomeInput").value.replace(/,/g, '').replace(/\$/g, ''); // Remove commas and dollar sign
+      console.log(inputValue)
+      const income = Number(inputValue);
+      if (!income || income < 0) return;
+
+      const entry = incomeData.find(row => income >= row.Min && income <= row.Max);
+      if (!entry) return;
+
+      const peopleLess = entry.totals;
+      const peopleSame = entry.Returns;
+
+      const totalReturns = incomeData[incomeData.length - 1].totals;
+      const percentile = Math.floor((peopleLess / totalReturns) * 100);
+
+      document.getElementById("sameIncome").textContent = `People earning the same range (${entry.Min}–${entry.Max}): ${peopleSame.toLocaleString()}`;
+      document.getElementById("lessIncome").textContent = `People earning less than you: ${peopleLess.toLocaleString()}`;
+      document.getElementById("percentile").textContent = `You make more than ${percentile}% of Americans`;
+
+      document.getElementById("results").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
